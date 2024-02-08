@@ -17,9 +17,10 @@ import { useForm } from "react-hook-form";
 import Input from "./components/Input";
 import InputPassWord from "./components/InputPassword";
 import ArrowsOrBox from "./components/ArrowsOrBox";
+import companyIcon from './images/png/companyIcon.jpg'
 
 import Logo from "./images/png/logo.png";
-
+import api from "../../services/api";
 import { theme } from "../../global/theme";
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -32,17 +33,17 @@ const Landing = () => {
     const [password, setPassword] = useState()
 
     const login = async () => {
-        if (mail == undefined)
+
+        if (mail == undefined){
             return Toast.error("Informe um email!")
-
-        if (password === undefined)
+        }
+        if (password === undefined){
             return Toast.error("Informe uma senha!")
+        }
 
-        navigation.navigate("Dashboard")
-
-        const response = await api.post("session/storage", {
-            mail: control._formValues.email,
-            password: control._formValues.password
+        const response = await api.post("session/storage/panel", {
+            mail:mail,
+            password:password
         })
 
         if (response.status == 200) {
@@ -50,27 +51,34 @@ const Landing = () => {
             AsyncStorage.setItem("@MAIL", response.data.user.mail)
             AsyncStorage.setItem("@USERID", response.data.user.id)
             navigation.navigate("Dashboard")
+            return false
         }
-        else
-            return Toast.error(response.data.error);
+
+        Toast.error("Email ou senha inválidos!")
+    }
+
+    const redirectToRegisterPage = async () => {
+
+        navigation.navigate("Register")
+    
     }
 
     return (
         <ScrollView style={{ backgroundColor: "white" }}>
+            <View style={styles.container}>
             <ToastManager width={"90%"} />
 
-            <View style={styles.container}>
                 <StatusBar
                     backgroundColor={theme.colors.background}
                     barStyle={"dark-content"}
                 />
-
                 <View style={styles.header}>
-                    <Image source={Logo} />
+                    <Image style={styles.companyIcon} source={companyIcon} />
                     <Text style={styles.textHeader}>Dados de acesso</Text>
                 </View>
 
                 <View style={styles.boxInputContainer}>
+
                     <View style={styles.boxInput}>
                         <Text style={styles.textInput}>E-mail </Text>
                         <Input
@@ -102,7 +110,7 @@ const Landing = () => {
                     <Text style={styles.textButtonSingIn}>Entrar</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.rowRegister}>
+                <TouchableOpacity onPress={() => redirectToRegisterPage()} style={styles.rowRegister}>
                     <Text style={styles.textPrimaryRegister}>Não tem uma conta?</Text>
                     <Text style={styles.textSecondaryRegister}>Cadastre-se</Text>
                 </TouchableOpacity>
@@ -244,6 +252,11 @@ const styles = ScaledSheet.create({
         marginTop: "44@s",
         marginBottom: "35@s",
     },
+
+    companyIcon:{
+        width:170,
+        height:120
+    }
 });
 
 export default Landing;

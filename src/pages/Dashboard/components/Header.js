@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { View, TouchableOpacity, Image } from "react-native";
 import { ScaledSheet } from "react-native-size-matters";
 import { useNavigation } from "@react-navigation/core";
-import companyIcon from "../images/png/companyIcon.png";
+import companyIcon from "../images/png/companyIcon.jpg";
 import Menu from "../images/svg/Menu"
 import { theme } from "../../../global/theme";
 import UserIcon from "../images/png/man.png";
@@ -87,12 +87,12 @@ navigation.addListener("focus",() => {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={navigation.toggleDrawer}>
+      <TouchableOpacity style={{width:50}} onPress={navigation.toggleDrawer}>
         <Menu />
       </TouchableOpacity>
-
+      
       <TouchableOpacity >
-      <Image source={companyIcon} style={{width:180,height:100}} />
+      <Image source={companyIcon} style={{width:170,height:100}} />
       </TouchableOpacity>
       
       <TouchableOpacity

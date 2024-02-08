@@ -1,40 +1,51 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import CurrencyInput from 'react-native-currency-input';
-import {ScaledSheet} from 'react-native-size-matters'
+import { ScaledSheet } from 'react-native-size-matters'
+import { View, Text } from 'react-native'
 import { theme } from '../../../global/theme';
-const InputMoney = ({}) => {
-    const [value, setValue] = React.useState(0);
+const InputMoney = ({ value, onChangeText, error }) => {
 
-    return(
-        
-        <CurrencyInput
+  return (
+    <View>
+      <CurrencyInput
         value={value}
-        onChangeValue={setValue}
+        onChangeValue={onChangeText}
         style={styles.input}
         delimiter="."
         separator=","
-        placeholder='R$ 00,00'
+
         precision={2}
-        minValue={0}
-        onChangeText={(formattedValue) => {
-          console.log(formattedValue); // R$ +2.310,46
-        }}
       />
-    )
+      {error == true
+
+        ?
+        <Text style={styles.textError}>Informe um valor</Text>
+        :
+        <></>
+      }
+    </View>
+  )
 }
 
 const styles = ScaledSheet.create({
-    input:{
-        width: "276@s",
-        paddingLeft:"15@s",
-        height:50,
-        fontFamily:theme.fonts.fontPoppinsTitleBold,
-        fontSize:"20@s",
-        marginLeft:"22@s",
-        marginTop:"20@s",
-        borderWidth:0.4,
-        borderRadius:21,
-    }
+  input: {
+    width: "276@s",
+    paddingLeft: "15@s",
+    height: 50,
+    fontFamily: theme.fonts.fontPoppinsTitleBold,
+    fontSize: "15@s",
+    marginLeft: "22@s",
+    marginTop: "20@s",
+    borderWidth: 0.4,
+    borderRadius: 21,
+  },
+  textError: {
+    fontFamily: theme.fonts.PopinsMedium,
+    fontSize: "10@s",
+    color: "red",
+    marginTop:"10@s",
+    marginLeft: "28@s",
+  }
 })
 
 export default InputMoney

@@ -1,5 +1,5 @@
 import React from "react";
-import { View,Text } from 'react-native'
+import { View, Text } from 'react-native'
 import { TextInput } from "react-native";
 import { TextInputMask } from 'react-native-masked-text'
 import { ScaledSheet } from "react-native-size-matters";
@@ -17,7 +17,8 @@ const Input = ({
     typeMask,
     styleErr,
     err,
-    label
+    label,
+    error
 }) => {
 
 
@@ -51,13 +52,21 @@ const Input = ({
 
                         </View>
                         :
+
                         <TextInput
                             keyboardType={type}
                             onChangeText={onChangeText}
-                            style={err == true ? styleErr : styleInput}
+                            style={styles.input}
                             secureTextEntry={secureTextEntry}
                             placeholder={placeholder}
                         />
+            }
+            {error == true
+
+                ?
+                <Text style={styles.textError}>Informe um valor</Text>
+                :
+                <></>
             }
         </View>
     );
@@ -65,17 +74,25 @@ const Input = ({
 
 
 const styles = ScaledSheet.create({
-    boxInput:{
-        marginTop:"24@s"
+    input: {
+        width: "276@s",
+        paddingLeft: "15@s",
+        height: 50,
+        fontFamily: theme.fonts.fontPoppinsTitleBold,
+        fontSize: "15@s",
+        marginLeft: "22@s",
+        marginTop: "20@s",
+        borderWidth: 0.4,
+        borderRadius: 21,
     },
-    textPrimary:{
-        position:"relative",
-        top:"-91@s",
-        color:"#000000",
-        fontSize:"14@s",
-        fontFamily:theme.fonts.PopinsMedium,
-    }
-  });
+    textError: {
+        fontFamily: theme.fonts.PopinsMedium,
+        fontSize: "10@s",
+        color: "red",
+        marginTop:"10@s",
+        marginLeft: "28@s",
+      }
+});
 
 
 export default Input;

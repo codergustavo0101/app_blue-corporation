@@ -2,7 +2,7 @@ import { create } from 'apisauce'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const api = create({
-  baseURL: "http://10.0.20.236:3000/",
+  baseURL: "http://192.168.0.22:9999/",
   timeout: 30000
 })
 

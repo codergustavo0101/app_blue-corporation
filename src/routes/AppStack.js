@@ -7,6 +7,8 @@ import * as Sentry from 'sentry-expo';
 
 import { createDrawerNavigator } from '@react-navigation/drawer'
 import Landing from '../pages/Landing'
+import Register from '../pages/Register'
+
 import Dashboard from '../pages/Dashboard'
 import Providers from '../pages/Providers'
 import Provider from '../pages/Provider'
@@ -24,10 +26,12 @@ const Stack = createNativeStackNavigator()
 
 const Drawer = createDrawerNavigator()
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 const AppStack = () => {
 
-  
+
   Sentry.init({
     dsn: "https://e35f5b540345fca1fb211066560609cd@o4506652031385600.ingest.sentry.io/4506652032696320",
     enableInExpoDevelopment: true, // Permite rastrear erros durante o desenvolvimento no Expo
@@ -41,19 +45,22 @@ const AppStack = () => {
     Sentry.captureException(error);
   }
 
-  const [userAuthenticated, setUserAuthenticated] = useState(false);
+  const [userAuthenticated, setUserAuthenticated] = useState(null);
 
 
-  // useEffect(() => {
+  useEffect(() => {
 
-  //   const checkAuthentication = async () => {
-  //     const isAuthenticated = true;
+    const checkAuthentication = async () => {
+      const response = await AsyncStorage.getItem("@TOKEN")
+      if(response == null){
+        setUserAuthenticated(false)
+      }else{
+        setUserAuthenticated(true)
+      }
+    };
 
-  //     // setUserAuthenticated(isAuthenticated);
-  //   };
-
-  //   checkAuthentication();
-  // }, []);
+    checkAuthentication();
+  }, []);
   try {
 
     if (userAuthenticated === null) {
@@ -64,22 +71,36 @@ const AppStack = () => {
         </View>
       );
     }
-  
+
     if (userAuthenticated == false) {
       // Redirecionar para a tela de login ou qualquer tela de autenticação
       // Você deve substituir 'Auth' pela tela de autenticação real
       return (
-        <NavigationContainer >
-          <Stack.Navigator screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="Auth" component={Landing} />
-            <Stack.Screen name="Dashboard" component={Dashboard} />
+        <NavigationContainer>
+        <Drawer.Navigator screenOptions={{
+          swipeEdgeWidth: 0,
+          headerShown: false,
+          drawerStyle: {
+            width: 266,
+            height: "100%",
+            borderTopEndRadius: 17,
+            borderBottomEndRadius: 17,
+          },
+        }}
+          drawerContent={(props) => <Sidebar {...props} />}
 
-          </Stack.Navigator>
-        </NavigationContainer>
+        >
+          <Drawer.Screen name="Landing" component={Landing} />
+          <Drawer.Screen name="Register" component={Register} />
+          <Drawer.Screen name="Dashboard" component={Dashboard} />
+
+          <Drawer.Screen name="Profile" component={Profile} />
+        </Drawer.Navigator>
+      </NavigationContainer>
       );
     }
-  
-  
+
+
     return (
       <NavigationContainer>
         <Drawer.Navigator screenOptions={{
@@ -93,7 +114,7 @@ const AppStack = () => {
           },
         }}
           drawerContent={(props) => <Sidebar {...props} />}
-  
+
         >
           <Drawer.Screen name="Dashboard" component={Dashboard} />
           <Drawer.Screen name="Providers" component={Providers} />
@@ -104,7 +125,6 @@ const AppStack = () => {
           <Drawer.Screen name="Profile" component={Profile} />
           <Drawer.Screen name="CreateSchedule" component={CreateSchedule} />
           <Drawer.Screen name="Payment" component={Payment} />
-
         </Drawer.Navigator>
       </NavigationContainer>
     );

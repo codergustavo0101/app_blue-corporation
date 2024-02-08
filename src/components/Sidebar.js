@@ -4,7 +4,7 @@ import { DrawerContentScrollView } from "@react-navigation/drawer";
 import { ScaledSheet } from "react-native-size-matters";
 import { BackHandler } from "react-native";
 import Logo from "../images/svg/Logo";
-import companyIcon from '../images/png/companyIcon.png'
+import companyIcon from '../images/png/companyIcon.jpg'
 import HomeIcon from "../images/svg/HomeIcon";
 import SchedulesIcon from "../images/svg/SchedulesIcon";
 import ChatIcon from "../images/svg/ChatIcon";
@@ -29,6 +29,7 @@ const Sidebar = (props) => {
         AsyncStorage.removeItem("@MAIL")
         AsyncStorage.removeItem("@TOKEN")
         AsyncStorage.removeItem("@USERID")
+        AsyncStorage.clear()
           // Adiciona um listener para o evento de hardware 'back'
           BackHandler.addEventListener('hardwareBackPress', handleBackPress);
       
@@ -72,44 +73,6 @@ const Sidebar = (props) => {
                             }
                         >
                             Home
-                        </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={
-                            currentPage === 1
-                                ? styles.pageButtonActive
-                                : styles.pageButtonDisabled
-                        }
-                        onPress={() => navigate(1, "InitialSchedules")}
-                    >
-                        <SchedulesIcon color={currentPage === 1 ? "#fff" : "#787486"} />
-                        <Text
-                            style={
-                                currentPage === 1
-                                    ? styles.pageTextActive
-                                    : styles.pageTextDisabled
-                            }
-                        >
-                            Agendamentos
-                        </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={
-                            currentPage === 3
-                                ? styles.pageButtonActive
-                                : styles.pageButtonDisabled
-                        }
-                        onPress={() => navigate(3, "Drive")}
-                    >
-                        <FavoritesIcon color={currentPage === 3 ? "#fff" : "#787486"} />
-                        <Text
-                            style={
-                                currentPage === 3
-                                    ? styles.pageTextActive
-                                    : styles.pageTextDisabled
-                            }
-                        >
-                            Meu Drive
                         </Text>
                     </TouchableOpacity>
 

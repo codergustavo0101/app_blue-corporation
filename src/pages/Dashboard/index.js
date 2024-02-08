@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { View, Text, ScrollView, TouchableOpacity, Dimensions, Image } from 'react-native'
 import Header from './components/Header'
 import { ScaledSheet } from "react-native-size-matters";
@@ -7,23 +7,78 @@ import DashboardCard from './components/DashboardCard';
 import Transactions from './components/Transactions';
 import Modal from "react-native-modal";
 import InputMoney from './components/InputMoney';
+import ToastManager, { Toast } from 'toastify-react-native';
+import Input from './components/Input';
 import pixIcon from './images/png/pixIcon.webp'
+import api from '../../services/api';
+import loader from './images/png/animation.gif'
+import LottieView from 'lottie-react-native';
+
 const Dashboard = () => {
 
     const [cancelModalVisible, setCancelModalVisible] = useState()
-    const [modalDepositVisible, setModalDepoistVisible] = useState()
+    const [solicit, setSolicit] = useState(0)
+    const [value, setValue] = useState(0)
+    const [animation, setAnimation] = useState(false)
+    const [pix, setPix] = useState()
 
-    const [value, setValue] = useState(2310.458)
+    /* ERROR MESSAGES */
+    const [solictError, setSolicitError] = useState(false)
+    const [pixError, setPixError] = useState(false)
+
+    const storageSolicit = async () => {
+
+        if (solicit == 0) {
+            setSolicitError(true)
+        }
+
+        if (pix == undefined || pix == "") {
+            setPixError(true)
+        }
+
+        if (solicit == 0 || pix == undefined || pix == "") {
+            return false
+        }
+
+        setAnimation(true)
+
+        const response = await api.post("balance/storage", {
+            "user_solicit": solicit
+        })
+
+        
+        if (response.status == 401) {
+            setAnimation(false)
+            setCancelModalVisible(false)
+            setPix()
+            setSolicit(0)
+            Toast.error("Saldo insuficiente!")
+        }
+    }
+
+    useEffect(() => {
+
+        if (solicit != 0) {
+            setSolicitError()
+        }
+
+        if (pix != undefined && pix != "") {
+            setPixError(false)
+        }
+
+    }, [solicit, pix])
+
     const CancelModalContent = () => {
         return (
             <View style={styles.cancelModal}>
+
                 <View style={styles.modalHeader}>
                     <View
                         style={{
                             display: "flex",
                             flexDirection: "row",
                             alignItems: "center",
-                            justifyContent: "center",
+                            justifyConAtent: "center",
                         }}
                     >
                         <TouchableOpacity
@@ -35,6 +90,8 @@ const Dashboard = () => {
                         <Text style={styles.modalHeaderTitle}>Solicitação</Text>
                     </View>
                     <TouchableOpacity
+                            onPress={() => setCancelModalVisible(false)}
+
                         style={{
                             ...styles.modalHeaderButton,
                             backgroundColor: theme.colors.red2,
@@ -42,7 +99,6 @@ const Dashboard = () => {
                     // onPress={handleCancelSchedule}
                     >
                         <Text
-                            onPress={() => setCancelModalVisible(false)}
                             style={{
                                 ...styles.modalHeaderButtonText,
                                 color: theme.colors.red3,
@@ -59,77 +115,31 @@ const Dashboard = () => {
                     Informe um valor para solicitar
                 </Text>
 
-                <InputMoney value={value} onChangeText={setValue} />
+                <InputMoney error={solictError} value={solicit} onChangeText={setSolicit} />
+                <Input error={pixError} onChangeText={setPix} placeholder={"Chave Pix"} type={"text"} />
 
-                <TouchableOpacity style={styles.btnSend}>
-                <Image style={styles.imageBtn} source={pixIcon}/>
-                    <Text style={styles.textPrimaryBtnSend}>Confirmar</Text>
+                <TouchableOpacity style={styles.btnSend} onPress={() => storageSolicit()}>
+                    {animation == true
+                        ?
+                        <LottieView autoPlay style={{ width: 220 }} source={require("./images/json/animation.json")} />
+                        :
+                        <>
+                            <Image style={styles.imageBtn} source={pixIcon} />
+                            <Text style={styles.textPrimaryBtnSend}>Confirmar</Text>
+                        </>
+                    }
                 </TouchableOpacity>
 
             </View>
         )
     }
 
-    const DepositModalContent = () => {
-        return (
-            <View style={styles.cancelModal}>
-                <View style={styles.modalHeader}>
-                    <View
-                        style={{
-                            display: "flex",
-                            flexDirection: "row",
-                            alignItems: "center",
-                            justifyContent: "center",
-                        }}
-                    >
-                        <TouchableOpacity
-                            style={{
-                            }}
-                            onPress={() => toggleModal(setCancelModalVisible)}
-                        >
-                        </TouchableOpacity>
-                        <Text style={styles.modalHeaderTitle}>Depositar</Text>
-                    </View>
-                    <TouchableOpacity
-                        style={{
-                            ...styles.modalHeaderButton,
-                            backgroundColor: theme.colors.red2,
-                        }}
-                    // onPress={handleCancelSchedule}
-                    >
-                        <Text
-                            onPress={() => setCancelModalVisible(false)}
-                            style={{
-                                ...styles.modalHeaderButtonText,
-                                color: theme.colors.red3,
-                            }}
-                        >
-                            Cancelar
-                        </Text>
-                    </TouchableOpacity>
-                </View>
-
-                {/* <Spacer /> */}
-
-                <Text style={styles.textPrimarySolicit}>
-                    Informe um valor para depositar
-                </Text>
-
-                <InputMoney value={value} onChangeText={setValue} />
-
-                <TouchableOpacity style={styles.btnSend}>
-                <Image style={styles.imageBtn} source={pixIcon}/>
-                    <Text style={styles.textPrimaryBtnSend}>Confirmar</Text>
-                </TouchableOpacity>
-
-            </View>
-        )
-    }
 
     return (
 
         <>
             <Header />
+            <ToastManager width={"90%"} />
 
             <ScrollView style={{ backgroundColor: "white" }}>
                 <View style={styles.boxServices}>
@@ -147,15 +157,7 @@ const Dashboard = () => {
                         {CancelModalContent()}
                     </Modal>
 
-                    <Modal
-                        useNativeDriver
-                        useNativeDriverForBackdrop
-                        backdropColor={theme.colors.white}
-                        coverScreen
-                        isVisible={modalDepositVisible}
-                    >
-                        {DepositModalContent()}
-                    </Modal>
+         
 
 
                 </View>
@@ -187,7 +189,7 @@ const styles = ScaledSheet.create({
         marginBottom: -18,
 
         width: Dimensions.get("screen").width,
-        height: "282@vs",
+        height: "382@vs",
 
         borderTopLeftRadius: "20@msr",
         borderTopRightRadius: "20@msr",
@@ -217,6 +219,11 @@ const styles = ScaledSheet.create({
         borderRadius: "50@msr",
     },
 
+    loaderIcon: {
+        width: 150,
+        resizeMode: "cover"
+
+    },
     textPrimarySolicit: {
         fontFamily: theme.fonts.fontPoppinsTitleBold,
         fontSize: "15@s",
@@ -228,7 +235,6 @@ const styles = ScaledSheet.create({
         width: "276@s",
         justifyContent: "center",
         alignItems: "center",
-
         shadowColor: "#000000",
         shadowOffset: {
             width: 0,
@@ -238,9 +244,9 @@ const styles = ScaledSheet.create({
         shadowRadius: 3.05,
         elevation: 4,
         borderRadius: 33,
-        height: 45,
+        height: 55,
         marginLeft: "22@s",
-        marginTop: "50@s"
+        marginTop: "35@s"
     },
     textPrimaryBtnSend: {
         fontSize: "14@s",
